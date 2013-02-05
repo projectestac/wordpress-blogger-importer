@@ -235,6 +235,23 @@ class Blogger_Importer extends WP_Importer {
 
 		$authors = $feed->get_authors();
 
+		// XTEC ************ MODIFICAT - Check if is valid file
+		// 2015.09.09 @nacho
+		if (!empty($authors)) {
+			foreach ($authors as $author) {
+				$login = sanitize_user( $author->get_name(), true );
+				$this->authors[$login] = array(
+						'author_login' => $author->get_name(),
+						'author_display_name' => $author->get_name(),
+						'author_email' => $author->get_email(),
+				);
+			}
+		}else {
+			_e( 'Error getting file info', 'blogger-importer' );
+			exit;
+		}
+		//************ ORIGINAL
+		/*
 		foreach ($authors as $author) {
 			$login = sanitize_user( $author->get_name(), true );
 			$this->authors[$login] = array(
@@ -243,6 +260,8 @@ class Blogger_Importer extends WP_Importer {
 				'author_email' => $author->get_email(),
 			);
 		}
+		*/
+		//************ FI
 	}
 
 	/**
@@ -342,10 +361,25 @@ class Blogger_Importer extends WP_Importer {
 						$this->processed_authors[$old_id] = $user_id;
 					$this->author_mapping[$santized_old_login] = $user_id;
 				} else {
+					// XTEC ************ MODIFICAT - Check if user already exists
+					// 2015.09.09 @nacho
+					if ( username_exists($_POST['user_new'][0]) ) {
+						printf( __( 'Failed to create new user because already exists. Their posts will be attributed to the current user.', 'blogger-importer' ));
+					}else {
+						printf( __( 'Failed to create new user for %s. Their posts will be attributed to the current user.', 'blogger-importer' ), esc_html($this->authors[$old_login]['author_display_name']) );
+						if ( defined('IMPORT_DEBUG') && IMPORT_DEBUG )
+							echo ' ' . $user_id->get_error_message();
+						echo '<br />';
+					}
+					//************ ORIGINAL
+					/*
 					printf( __( 'Failed to create new user for %s. Their posts will be attributed to the current user.', 'blogger-importer' ), esc_html($this->authors[$old_login]['author_display_name']) );
 					if ( defined('IMPORT_DEBUG') && IMPORT_DEBUG )
 						echo ' ' . $user_id->get_error_message();
 					echo '<br />';
+					*/
+					//************ FI
+
 				}
 			}
 
