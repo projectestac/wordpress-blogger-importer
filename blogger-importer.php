@@ -588,7 +588,16 @@ class Blogger_Importer extends WP_Importer {
 			foreach($this->get_images($importedcontent) as $lowrez => $highrez) {
 				if (!$this->image_filter($lowrez)) {
 					//Pass null for description so that the default (filename) is used, might be good to use Alt tag instead?
+
+// XTEC ************ MODIFICAT - Fixed import of images (https://wordpress.org/support/topic/images-not-importing-post_excerpt-error/)
+// 2016.09.07 @aginard
+					$newcontent = $this->import_image($importedpost->ID, $lowrez, $highrez, '', $img_count, $importedcontent, $this->host, $author);
+//************ ORIGINAL
+/*
 					$newcontent = $this->import_image($importedpost->ID, $lowrez, $highrez, null, $img_count, $importedcontent, $this->host, $author);
+*/
+//************ FI
+
 					if (!is_wp_error($newcontent)) {
 						$importedcontent = $newcontent;
 						$img_count++;
